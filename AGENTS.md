@@ -2,7 +2,7 @@
 
 ## Quick Start
 ```bash
-cd /Users/mahirvliyev/Desktop/YTBT/youtube_downloader_bot
+cd /Users/mahirvliyev/Projects/youtube_downloader_bot
 export PATH="$HOME/.local/bin:$PATH"
 python3 main.py
 ```
@@ -45,8 +45,29 @@ Docker: `docker compose up -d`
 - `logs/bot.log` — bot activity
 - `bot_output.log` — stdout/stderr
 
+## Auto-start (launchd)
+- Service: `com.ytbt.bot`
+- Loads automatically at login
+- Restarts if crashes
+- Plist: `~/Library/LaunchAgents/com.ytbt.bot.plist`
+- Control:
+  - `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.ytbt.bot.plist` — start
+  - `launchctl bootout gui/$(id -u)/com.ytbt.bot` — stop
+  - `launchctl list | grep ytbt` — status
+
+## Known limits
+- Telegram max file size: 50MB
+- Files larger than 50MB will fail with `TelegramEntityTooLarge`
+
+## Shell Aliases
+- `ytbt` — cd to project
+- `ytbt-start` — start bot
+- `ytbt-logs` — watch logs
+- `ytbt-status` — check if running
+
 ## To reopen later
 ```bash
-cd /Users/mahirvliyev/Desktop/YTBT/youtube_downloader_bot
+cd /Users/mahirvliyev/Projects/youtube_downloader_bot
 # Everything is already connected — just start the bot
+# Or use: ytbt
 ```

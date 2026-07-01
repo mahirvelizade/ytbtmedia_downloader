@@ -3,6 +3,7 @@ import time
 from typing import Dict, Optional
 
 from aiogram import Router, F
+from aiogram.exceptions import TelegramEntityTooLarge
 from aiogram.types import Message, CallbackQuery, FSInputFile
 
 from app.keyboards.inline import (
@@ -159,6 +160,18 @@ async def start_download(callback: CallbackQuery) -> None:
 
         await bot.delete_message(chat_id, message_id)
 
+    except TelegramEntityTooLarge:
+        logger.warning(f"File too large for user {user_id}")
+        try:
+            await bot.edit_message_text(
+                "File is too large (max 50MB). Try a shorter video or lower quality.",
+                chat_id=chat_id,
+                message_id=message_id,
+            )
+        except Exception:
+            await callback.message.answer(
+                "File is too large (max 50MB). Try a shorter video or lower quality."
+            )
     except Exception:
         logger.exception(f"Download failed for user {user_id}")
         try:
