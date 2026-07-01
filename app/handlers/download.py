@@ -129,6 +129,9 @@ async def start_download(callback: CallbackQuery) -> None:
 
     await bot.edit_message_text("⬇ Downloading...", chat_id=chat_id, message_id=message_id)
 
+    file_path = None
+    parts = []
+
     try:
         if fmt == "mp3":
             file_path = await downloader_service.download_mp3(
@@ -161,11 +164,40 @@ async def start_download(callback: CallbackQuery) -> None:
                 await callback.message.answer_video(input_file)
             sent = True
         except TelegramEntityTooLarge:
+            if fmt == "mp3":
+                lower_qualities = ["48", "32"]
+                current_idx = lower_qualities.index(quality) + 1 if quality in lower_qualities else 0
+                retried = False
+                for q in lower_qualities[current_idx:]:
+                    await bot.edit_message_text(
+                        f"⬇ Retrying at {q}kbps (smaller file)...",
+                        chat_id=chat_id, message_id=message_id,
+                    )
+                    cleanup_file(file_path)
+                    file_path = await downloader_service.download_mp3(
+                        url=url, quality=q,
+                        user_id=user_id, chat_id=chat_id,
+                        message_id=message_id, bot=bot,
+                    )
+                    input_file = FSInputFile(file_path)
+                    try:
+                        if fmt == "mp3":
+                            await callback.message.answer_audio(input_file)
+                        else:
+                            await callback.message.answer_video(input_file)
+                        retried = True
+                        sent = True
+                        break
+                    except TelegramEntityTooLarge:
+                        continue
+                if retried:
+                    await bot.delete_message(chat_id, message_id)
+                    return
+
             await bot.edit_message_text(
                 "📤 Splitting file into parts...",
                 chat_id=chat_id, message_id=message_id,
             )
-            parts = []
             if fmt == "mp3":
                 parts = await split_audio(file_path)
             else:
@@ -217,7 +249,7 @@ async def start_download(callback: CallbackQuery) -> None:
             )
     finally:
         user_data.pop(user_id, None)
-        if "parts" in locals():
+        if parts:
             cleanup_files(parts)
-        elif "file_path" in locals():
+        elif file_path:
             cleanup_file(file_path)
