@@ -12,7 +12,7 @@ def get_format_keyboard() -> InlineKeyboardMarkup:
 
 def get_mp3_quality_keyboard() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    for quality in ["64", "96", "128", "160"]:
+    for quality in ["32", "48", "64", "96", "128"]:
         builder.button(
             text=f"{quality} kbps",
             callback_data=f"quality:mp3:{quality}",

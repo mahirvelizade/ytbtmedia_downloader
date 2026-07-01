@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from aiogram import Router, F
 from aiogram.exceptions import TelegramEntityTooLarge
@@ -13,7 +13,7 @@ from app.keyboards.inline import (
 )
 from app.services.youtube import YouTubeService
 from app.services.downloader import downloader_service
-from app.utils.file_utils import cleanup_file
+from app.utils.file_utils import cleanup_file, cleanup_files, split_audio, split_video
 
 logger = logging.getLogger(__name__)
 
@@ -152,13 +152,44 @@ async def start_download(callback: CallbackQuery) -> None:
         await bot.edit_message_text("📤 Uploading...", chat_id=chat_id, message_id=message_id)
 
         input_file = FSInputFile(file_path)
+        sent = False
 
-        if fmt == "mp3":
-            await callback.message.answer_audio(input_file)
-        else:
-            await callback.message.answer_video(input_file)
+        try:
+            if fmt == "mp3":
+                await callback.message.answer_audio(input_file)
+            else:
+                await callback.message.answer_video(input_file)
+            sent = True
+        except TelegramEntityTooLarge:
+            await bot.edit_message_text(
+                "📤 Splitting file into parts...",
+                chat_id=chat_id, message_id=message_id,
+            )
+            parts = []
+            if fmt == "mp3":
+                parts = await split_audio(file_path)
+            else:
+                parts = await split_video(file_path)
 
-        await bot.delete_message(chat_id, message_id)
+            total = len(parts)
+            for i, part in enumerate(parts, 1):
+                await bot.edit_message_text(
+                    f"📤 Uploading part {i}/{total}...",
+                    chat_id=chat_id, message_id=message_id,
+                )
+                input_part = FSInputFile(part)
+                if fmt == "mp3":
+                    await callback.message.answer_audio(
+                        input_part, caption=f"Part {i}/{total}"
+                    )
+                else:
+                    await callback.message.answer_video(
+                        input_part, caption=f"Part {i}/{total}"
+                    )
+            sent = True
+
+        if sent:
+            await bot.delete_message(chat_id, message_id)
 
     except TelegramEntityTooLarge:
         logger.warning(f"File too large for user {user_id}")
@@ -186,5 +217,7 @@ async def start_download(callback: CallbackQuery) -> None:
             )
     finally:
         user_data.pop(user_id, None)
-        if "file_path" in locals():
+        if "parts" in locals():
+            cleanup_files(parts)
+        elif "file_path" in locals():
             cleanup_file(file_path)
