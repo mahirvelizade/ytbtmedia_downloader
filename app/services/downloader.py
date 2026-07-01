@@ -43,6 +43,19 @@ class ProgressInfo:
             }
 
 
+_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
+        " AppleWebKit/537.36 (KHTML, like Gecko)"
+        " Chrome/120.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
+}
+
+_EXTRACTOR_ARGS = {"youtube": {"skip": ["webpage"]}}
+
+
 class DownloaderService:
     def __init__(self) -> None:
         self._active: Set[int] = set()
@@ -83,6 +96,8 @@ class DownloaderService:
                 }
             ],
             "progress_hooks": [self._make_progress_hook(progress)],
+            "http_headers": dict(_HEADERS),
+            "extractor_args": dict(_EXTRACTOR_ARGS),
             "quiet": True,
             "no_warnings": True,
         }
@@ -141,6 +156,8 @@ class DownloaderService:
             "outtmpl": output_template,
             "merge_output_format": "mp4",
             "progress_hooks": [self._make_progress_hook(progress)],
+            "http_headers": dict(_HEADERS),
+            "extractor_args": dict(_EXTRACTOR_ARGS),
             "quiet": True,
             "no_warnings": True,
         }

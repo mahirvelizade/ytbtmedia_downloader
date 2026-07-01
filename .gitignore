@@ -1,1 +1,8 @@
+.env
+downloads/
+temp/
 logs/
+__pycache__/
+*.pyc
+.DS_Store
+bot_output.log

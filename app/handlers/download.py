@@ -44,6 +44,9 @@ async def handle_youtube_url(message: Message) -> None:
 
     try:
         info = await youtube_service.get_info(url)
+        if not info:
+            await message.answer("Something went wrong.\n\nPlease try again later.")
+            return
     except Exception:
         logger.exception(f"Failed to extract info for URL: {url}")
         await message.answer("Something went wrong.\n\nPlease try again later.")
