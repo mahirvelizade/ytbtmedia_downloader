@@ -1,0 +1,11 @@
+services:
+  bot:
+    build: .
+    container_name: yt-downloader-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./downloads:/app/downloads
+      - ./temp:/app/temp
+      - ./logs:/app/logs
