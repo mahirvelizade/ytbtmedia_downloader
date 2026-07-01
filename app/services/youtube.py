@@ -37,7 +37,7 @@ class YouTubeService:
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                 "Accept-Language": "en-US,en;q=0.5",
             },
-            "extractor_args": {"youtube": {"skip": ["webpage"]}},
+            "extractor_args": {"youtube": {"skip": ["webpage", "dash", "hls"], "player_client": ["android"]}},
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             return ydl.extract_info(url, download=False)

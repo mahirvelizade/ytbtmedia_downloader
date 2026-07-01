@@ -53,7 +53,7 @@ _HEADERS = {
     "Accept-Language": "en-US,en;q=0.5",
 }
 
-_EXTRACTOR_ARGS = {"youtube": {"skip": ["webpage"]}}
+_EXTRACTOR_ARGS = {"youtube": {"skip": ["webpage"], "player_client": ["android", "ios"]}}
 
 
 class DownloaderService:
@@ -86,7 +86,7 @@ class DownloaderService:
         output_template = str(config.TEMP_PATH / "%(id)s.%(ext)s")
 
         ydl_opts = {
-            "format": "bestaudio/best",
+            "format": "bestaudio[ext=m4a]/bestaudio/best",
             "outtmpl": output_template,
             "postprocessors": [
                 {
@@ -98,6 +98,9 @@ class DownloaderService:
             "progress_hooks": [self._make_progress_hook(progress)],
             "http_headers": dict(_HEADERS),
             "extractor_args": dict(_EXTRACTOR_ARGS),
+            "throttledratelimit": 100000000,
+            "extractor_retries": 3,
+            "socket_timeout": 30,
             "quiet": True,
             "no_warnings": True,
         }
@@ -158,6 +161,9 @@ class DownloaderService:
             "progress_hooks": [self._make_progress_hook(progress)],
             "http_headers": dict(_HEADERS),
             "extractor_args": dict(_EXTRACTOR_ARGS),
+            "throttledratelimit": 100000000,
+            "extractor_retries": 3,
+            "socket_timeout": 30,
             "quiet": True,
             "no_warnings": True,
         }
