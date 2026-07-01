@@ -6,3 +6,4 @@ __pycache__/
 *.pyc
 .DS_Store
 bot_output.log
+AGENTS.md
