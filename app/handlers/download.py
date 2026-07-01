@@ -123,7 +123,7 @@ async def start_download(callback: CallbackQuery) -> None:
     message_id = callback.message.message_id
     bot = callback.bot
 
-    await bot.edit_message_text("⬇ Downloading...", chat_id, message_id)
+    await bot.edit_message_text("⬇ Downloading...", chat_id=chat_id, message_id=message_id)
 
     try:
         if fmt == "mp3":
@@ -145,7 +145,7 @@ async def start_download(callback: CallbackQuery) -> None:
                 bot=bot,
             )
 
-        await bot.edit_message_text("📤 Uploading...", chat_id, message_id)
+        await bot.edit_message_text("📤 Uploading...", chat_id=chat_id, message_id=message_id)
 
         input_file = FSInputFile(file_path)
 
@@ -161,8 +161,8 @@ async def start_download(callback: CallbackQuery) -> None:
         try:
             await bot.edit_message_text(
                 "Something went wrong.\n\nPlease try again later.",
-                chat_id,
-                message_id,
+                chat_id=chat_id,
+                message_id=message_id,
             )
         except Exception:
             await callback.message.answer(

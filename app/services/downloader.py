@@ -239,11 +239,11 @@ class DownloaderService:
                             f"Speed: {info['speed']}\n\n"
                             f"ETA: {info['eta']}"
                         )
-                        await bot.edit_message_text(text, chat_id, message_id)
+                        await bot.edit_message_text(text, chat_id=chat_id, message_id=message_id)
                     elif info["status"] == "processing" and not processing_updated:
                         text = f"{converting_emoji} {converting_text}"
                         try:
-                            await bot.edit_message_text(text, chat_id, message_id)
+                            await bot.edit_message_text(text, chat_id=chat_id, message_id=message_id)
                         except Exception:
                             pass
                         processing_updated = True
