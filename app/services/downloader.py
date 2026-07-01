@@ -85,6 +85,10 @@ class DownloaderService:
 
         output_template = str(config.TEMP_PATH / "%(id)s.%(ext)s")
 
+        cookies_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cookies.txt")
+        if not os.path.exists(cookies_file):
+            cookies_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "cookies.txt")
+
         ydl_opts = {
             "format": "bestaudio[ext=m4a]/bestaudio/best",
             "outtmpl": output_template,
@@ -95,6 +99,7 @@ class DownloaderService:
                     "preferredquality": quality,
                 }
             ],
+            "cookiefile": cookies_file if os.path.exists(cookies_file) else None,
             "progress_hooks": [self._make_progress_hook(progress)],
             "http_headers": dict(_HEADERS),
             "extractor_args": dict(_EXTRACTOR_ARGS),
@@ -154,10 +159,15 @@ class DownloaderService:
         output_template = str(config.TEMP_PATH / "%(id)s.%(ext)s")
         format_str = f"bestvideo[height<={quality}]+bestaudio/best"
 
+        cookies_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cookies.txt")
+        if not os.path.exists(cookies_file):
+            cookies_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "cookies.txt")
+
         ydl_opts = {
             "format": format_str,
             "outtmpl": output_template,
             "merge_output_format": "mp4",
+            "cookiefile": cookies_file if os.path.exists(cookies_file) else None,
             "progress_hooks": [self._make_progress_hook(progress)],
             "http_headers": dict(_HEADERS),
             "extractor_args": dict(_EXTRACTOR_ARGS),
